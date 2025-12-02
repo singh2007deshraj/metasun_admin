@@ -50,7 +50,7 @@ const navItems = [
   { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
   { text: "All Users", icon: <FaUsers />, path: "/all-users" },
   { text: "Packages Report", icon: <FaUsers />, path: "/upgrade-package" },
-  { text: "Old Withdrawal", icon: <FaUsers />, path: "/old-withdrawal" },
+  { text: "Pending Withdrawal", icon: <FaUsers />, path: "/pending-withdrawal" },
   { text: "Download DB", icon: <FaUsers />, path: "/download-db" },
   {
     text: "Income",

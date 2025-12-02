@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { base_url, bsc_url, handleCopy } from "../config";
-import { getToken, getUsers } from "../api";
+import { getToken, getUsers,getDeposit } from "../api";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Pagination } from "@mui/material";
 import { formatText, getPrice } from "../function";
@@ -21,28 +21,28 @@ function DepositUsdtReport() {
   const [toTime, setToTime] = useState("");
   const [totalDocs, setTotalDocs] = useState(0);
   const [price, setPrice] = useState(0);
-    const [income, setIncome] = useState({
-    total: 0,
-    finalTotal: 0
+  const [deposit, setTotel] = useState({
+    stakingUSDT: 0,
+    stakingmts: 0
   });
 
   const fetchData = async (currentPage, query, limit, fromTime, toTime) => {
     try {
       setLoading(true);
-      const response = await getUsers("upgrade-packages", {
-        page: currentPage,
-        limit,
-        query,
-        fromTime: fromTime
-          ? Math.floor(new Date(fromTime).getTime() / 1000)
+      const response = await getDeposit("upgrade-report", {
+        page: currentPage,limit,query,
+        fromTime: fromTime ? Math.floor(new Date(fromTime).getTime() / 1000)
           : "",
         toTime: toTime ? Math.floor(new Date(toTime).getTime() / 1000) : "",
       });
       if (response?.success) {
-        setData(response?.data);
-        setTotalPages(response?.pagination?.totalPages || 1);
-        setTotalDocs(response?.pagination?.totalDocs || 0);
-        setIncome(response?.income);
+        setData(response?.deposits);
+        setTotalPages(response?.totalPages || 1);
+        setTotalDocs(response?.totalCount || 0);
+        setTotel({
+          stakingUSDT:response?.stakingUSDT,
+          stakingmts:response?.stakingMTS,
+        });
         setError("");
       } else {
         setError("Failed to fetch data.");
@@ -92,12 +92,12 @@ function DepositUsdtReport() {
       <div className="container-fluid mt-4 bg-light p-4 rounded shadow-sm">
         <div className="d-flex align-items-center justify-content-between flex-wrap">
           <div className="mb-2 mb-md-0">
-            <span className="text-primary fw-bold">Total Amount:</span>{" "}
-            <span className="text-dark fs-5">{Number(income?.total).toFixed(8) || 0}</span>
+            <span className="text-primary fw-bold">Total Deposit(USDT) : </span>{" "}
+            <span className="text-dark fs-5">{Number(deposit?.stakingUSDT).toFixed(2) || 0}</span>
           </div>
           <div>
-            <span className="text-success fw-bold">Total Final Amount:</span>{" "}
-            <span className="text-dark fs-5">{Number(income?.finalTotal).toFixed(8) || 0}</span>
+            <span className="text-success fw-bold">Total Deposit(MTS):</span>{" "}
+            <span className="text-dark fs-5">{Number(deposit?.stakingmts).toFixed(2) || 0}</span>
           </div>
         </div>
       </div>
@@ -197,19 +197,16 @@ function DepositUsdtReport() {
                 <thead className="table-dark">
                   <tr className="text-center">
                     <th>#</th>
-                    <th>Time</th>
+                    <th>Date Time</th>
                     <th>User ID</th>
                     <th>User</th>
-                    <th>Sponsor ID</th>
-                    <th>Spill ID</th>
-                    <th>Amount (BTC)</th>
-                    <th>Final Amount(BTC)</th>
-                    <th>Package</th>
+                    <th>Amount (USDT)</th>
+                    <th>Amount(MTS)</th>
                     <th>Txn Hash</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.length === 0 ? (
+                  {data?.length === 0 ? (
                     <tr>
                       <td colSpan="8" className="text-center">
                         No records found
@@ -219,13 +216,13 @@ function DepositUsdtReport() {
                     data.map((entry, index) => (
                       <tr key={index} className="text-center">
                         <td>{(page - 1) * limit + index + 1}</td>
-                        <td>{new Date(entry.time * 1000).toLocaleString()}</td>
+                        <td>{new Date(entry.createdAt).toLocaleString()}</td>
                         <td>
                           <span className="d-inline-flex align-items-center gap-3">
-                            <span>{entry?.userId || "N/A"}</span>
+                            <span>{entry?.usersIdn || "N/A"}</span>
                             <button
                               className="btn btn-sm btn-light border"
-                              onClick={() => handleCopy(entry.userId || "N/A")}
+                              onClick={() => handleCopy(entry.usersIdn || "N/A")}
                             >
                               <MdContentCopy size={16} />
                             </button>
@@ -244,48 +241,21 @@ function DepositUsdtReport() {
                         </td>
                         <td>
                           <span className="d-inline-flex align-items-center gap-3">
-                            <span>{entry.sponsorId}</span>
-                            <button
-                              className="btn btn-sm btn-light border"
-                              onClick={() => handleCopy(entry.sponsorId)}
-                            >
-                              <MdContentCopy size={16} />
-                            </button>
-                          </span>
+                            <span>{entry?.depositAmt || '0'}</span>
+                            </span>
                         </td>
                         <td>
                           <span className="d-inline-flex align-items-center gap-3">
-                            <span>{entry.spillId}</span>
-                            <button
-                              className="btn btn-sm btn-light border"
-                              onClick={() => handleCopy(entry.spillId)}
-                            >
-                              <MdContentCopy size={16} />
-                            </button>
-                          </span>
+                            <span>{entry?.tokenAmt || '0'}</span>
+                           </span>
                         </td>
-                        <td
-                          title={`$${Number(
-                            (price * Number(entry?.amount)) / 1e18
-                          ).toFixed(4)}`}
-                        >
-                          BTC {(Number(entry.amount) / 1e18).toFixed(7)}
-                        </td>
-                        <td
-                          title={`$${Number(
-                            (price * Number(entry?.finalPayment)) / 1e18
-                          ).toFixed(4)}`}
-                        >
-                          BTC {(Number(entry.finalPayment) / 1e18).toFixed(7)}
-                        </td>
-                        <td>{packageName[entry?.toPackageId - 1]}</td>
                         <td>
                           <Link
                             className="tx-color"
-                            to={`${bsc_url}/${entry.transactionHash}`}
+                            to={`${bsc_url}/${entry.txHash}`}
                             target="_blank"
                           >
-                            {formatText(entry.transactionHash)}
+                            {formatText(entry.txHash)}
                           </Link>
                         </td>
                       </tr>
@@ -297,8 +267,8 @@ function DepositUsdtReport() {
 
             <div className="d-flex align-items-center justify-content-lg-between justify-content-center flex-wrap gap-3 mt-4">
               <div className="text-end text-black mt-2">
-                Showing {(page - 1) * limit + 1} to{" "}
-                {Math.min(page * limit, totalDocs)} from {totalDocs}
+                Showing {data.length > 0 ? (page - 1) * limit + 1 : 0} to{" "}
+                {data.length > 0 ? (page - 1) * limit + data.length : 0} from {totalDocs}
               </div>
               <Pagination
                 count={totalPages}

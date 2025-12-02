@@ -8,7 +8,7 @@ import { formatText } from "../function";
 import { Link } from "react-router-dom";
 import { MdContentCopy } from "react-icons/md";
 
-function ReferralIncome() {
+function allUserList() {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
@@ -20,13 +20,11 @@ function ReferralIncome() {
   const [toTime, setToTime] = useState("");
   const [totalDocs, setTotalDocs] = useState(0);
 
-  const fetchData = async (currentPage, query, limit, fromDate, toDate) => {
+  const fetchData = async (currentPage, query, limit) => {
     try {
       setLoading(true);
-      const response = await getUsers("all-users", {
-        page: currentPage,
-        limit,
-        query,
+      const response = await getUsers("userlist", {
+        page: currentPage,limit, query,
         fromTime: fromTime
           ? Math.floor(new Date(fromTime).getTime() / 1000)
           : undefined,
@@ -35,9 +33,11 @@ function ReferralIncome() {
           : undefined,
       });
       if (response?.success) {
-        setData(response?.user);
-        setTotalPages(response?.pagination?.totalPages || 1);
-        setTotalDocs(response?.pagination?.totalDocs || 0);
+        setData(response?.users);
+        setTotalPages(response?.totalPages || 1);
+        setTotalDocs(response?.totalCount || 0);
+        console.log("response?.totalPages ",response?.totalPages);
+        console.log("response?.totalCount ",response?.totalCount);
       } else {
         setError("Failed to fetch data.");
       }
@@ -74,11 +74,8 @@ function ReferralIncome() {
   return (
     <div className="container-fluid mt-4 bg-white p-4 rounded shadow-sm overflow-auto">
       <div className="d-flex flex-wrap align-items-center justify-content-between mb-4">
-        <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
-          {/* <div>
-            <h3 className="mb-0">All User Report</h3>
-          </div>{" "} */}
-          <div className="d-flex align-items-end gap-3 flex-wrap">
+       <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+         <div className="d-flex align-items-end gap-3 flex-wrap">
             <div>
               <label htmlFor="fromDate">From Date</label>
               <input
@@ -114,7 +111,7 @@ function ReferralIncome() {
               </button>
             </div>
           </div>
-        </div>
+        </div> 
         <div className="d-flex align-items-center gap-2 flex-wrap">
           <div className="d-flex align-items-center gap-2">
             <input
@@ -170,13 +167,13 @@ function ReferralIncome() {
                   <th>User ID</th>
                   <th>UserAddress</th>
                   <th>Sponsor ID</th>
-                  <th>Spill ID</th>
-                  <th>Current Rank</th>
-                  <th></th>
+                  <th>Direct Team</th>
+                  <th>Binary Team</th>
+                  {/* <th></th> */}
                 </tr>
               </thead>
               <tbody>
-                {data && data?.length === 0 ? (
+                 {data?.users?.length === 0 ? (
                   <tr>
                     <td colSpan="19" className="text-center">
                       No records found
@@ -186,15 +183,9 @@ function ReferralIncome() {
                   data?.map((entry, index) => (
                     <tr key={index} className="text-center">
                       <td>{(page - 1) * limit + index + 1}</td>
-                      <td>{new Date(entry.time * 1000).toLocaleString()}</td>
+                      <td>{new Date(entry.timestamp * 1000).toLocaleString()}</td>
                       <td>
-                        <span>{entry.userId || "N/A"}</span>
-                        <button
-                          className="btn btn-sm border bg-light ms-3"
-                          onClick={() => handleCopy(entry.userId)}
-                        >
-                          <MdContentCopy size={16} />
-                        </button>
+                        <span>{entry.usersIdn || "N/A"}</span>
                       </td>
                       <td>
                         <span>{formatText(entry.user)}</span>
@@ -206,33 +197,20 @@ function ReferralIncome() {
                         </button>
                       </td>
                       <td>
-                        <span>{entry?.sponsorId || "N/A"}</span>
-                        <button
-                          className="btn btn-sm border bg-light ms-3"
-                          onClick={() => handleCopy(entry.sponsorId || "")}
-                        >
-                          <MdContentCopy size={16} />
-                        </button>
-                      </td>
+                        <span>{entry?.rId || "N/A"}</span>
+                       </td>
                       <td>
-                        <span>{entry?.spillId || "N/A"}</span>
-                        <button
-                          className="btn btn-sm border bg-light ms-3"
-                          onClick={() => handleCopy(entry.spillId || "")}
-                        >
-                          <MdContentCopy size={16} />
-                        </button>
+                        <span>{entry?.directCount || 0}</span>
                       </td>
-                      <td>{packageName[entry.lastPackage - 1]}</td>
-                      <td>
+                      <td><span>{entry?.binaryTeam || 0}</span></td>
+                      {/* <td>
                         <Link
                           to={`https://btcmine.io/adminRoutes?userAddress=${entry?.user}`}
                           target="_blank"
-                          className="text-white btn-primary"
-                        >
+                          className="text-white btn-primary" >
                           Dashboard
                         </Link>
-                      </td>
+                      </td> */}
                     </tr>
                   ))
                 )}
@@ -241,8 +219,8 @@ function ReferralIncome() {
           </div>
           <div className="d-flex align-items-center justify-content-lg-between justify-content-center flex-wrap gap-3 mt-4">
             <div className="text-end text-black mt-2">
-              Showing {(page - 1) * limit + 1} to{" "}
-              {Math.min(page * limit, totalDocs)} from {totalDocs}
+             Showing {data.length > 0 ? (page - 1) * limit + 1 : 0} to{" "}
+  {data.length > 0 ? (page - 1) * limit + data.length : 0} from {totalDocs}
             </div>
             <Pagination
               count={totalPages}
@@ -260,4 +238,4 @@ function ReferralIncome() {
   );
 }
 
-export default ReferralIncome;
+export default allUserList;

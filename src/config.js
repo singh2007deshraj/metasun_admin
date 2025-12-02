@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 const PROD = import.meta.env.VITE_ENV
 console.log("Environment",PROD)
-export const base_url = (PROD === "development") ? "https://fantastic-invention-pqgp67wrx7xc5wg-8001.app.github.dev/metasun" : "https://api.btcmine.io/api";
+export const base_url = (PROD === "development") ? "https://api.metasun.live/metasuns/api" : "https://api.metasun.live/metasuns/api";
 // export const base_url = "http://localhost:8080/api";
 
 export const bsc_url = PROD === "development" ? "https://opbnb-testnet.bscscan.com/tx": "https://bscscan.com/tx"

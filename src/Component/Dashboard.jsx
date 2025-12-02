@@ -20,12 +20,13 @@ function Dashboard() {
     try {
       setLoading(true);
       const [res, res1] = await Promise.all([
-        getDashboardData("dashboard"),
-        getDashboardData("get-deducted-amt"),
+        getDashboardData("adminDashboard"),
+       // getDashboardData("get-deducted-amt"),
       ]);
 
       if (res?.success) {
-        setData(res.data);
+        console.log(res.data);
+          setData(res.data);
       }
       if (res1?.success) {
         setDeductedAmt((pre) => ({
@@ -58,57 +59,63 @@ function Dashboard() {
     },
     {
       icon: <FaUserShield />,
-      name: "Total Deposit (BTC)",
+      name: "Total Deposit (USDT)",
       value:
-        Number(data?.totalDeposits?.finalDeposits / 1e18 || 0).toFixed(8) || 0,
+        Number(data?.totalstakingUSDT || 0).toFixed(2) || 0,
     },
     {
       icon: <FaUserShield />,
-      name: "Referral Income",
+      name: "Total Deposit (MTS)",
       value:
-        Number(data?.referralIncome?.finalIncome / 1e18 || 0).toFixed(8) || 0,
+        Number(data?.totalstakingMTS || 0).toFixed(2) || 0,
     },
     {
       icon: <FaUserShield />,
-      name: "Level Income (BTC)",
-      value: Number(data?.levelIncome?.finalIncome / 1e18 || 0).toFixed(8) || 0,
-    },
-    {
-      icon: <FaUserShield />,
-      name: "Matrix Income (BTC)",
+      name: "ROI Income",
       value:
-        Number(data?.matrixIncome?.finalIncome / 1e18 || 0).toFixed(8) || 0,
+        Number(data?.totalRoiIncome || 0).toFixed(2) || 0,
     },
     {
       icon: <FaUserShield />,
-      name: "Flushed Out Income (BTC)",
-      value: Number(data?.flushIncome?.finalIncome / 1e18 || 0).toFixed(8) || 0,
+      name: "Level Income",
+      value: Number(data?.totallevelIncome || 0).toFixed(2) || 0,
     },
     {
       icon: <FaUserShield />,
-      name: "Total Withdrawal (BTC)",
-      value: Number(data?.withdrawals?.finalIncome || 0).toFixed(8) || 0,
+      name: "Binary Income",
+      value:
+        Number(data?.totalBinaryincome || 0).toFixed(2) || 0,
     },
     {
       icon: <FaUserShield />,
-      name: "Package Deduction Amt (0.1%)",
-      value: Number(deductedAmt?.pkgAmt).toFixed(8),
+      name: "Single Leg Bonus",
+      value: Number(data?.singlelegIncome || 0).toFixed(2) || 0,
     },
     {
       icon: <FaUserShield />,
-      name: "Referral Deduction Amt (10%)",
-      value: Number(deductedAmt?.refAmt).toFixed(8),
+      name: "Total Withdrawal",
+      value: Number(data?.withdrawals || 0).toFixed(2) || 0,
     },
-    {
-      icon: <FaUserShield />,
-      name: "Level Deduction Amt (10%)",
-      value: Number(deductedAmt?.levAmt).toFixed(8),
-    },
-    {
-      icon: <FaUserShield />,
-      name: "Matrix Deduction Amt (10%)",
-      value: Number(deductedAmt?.matAmt).toFixed(8),
-    },
+    // {
+    //   icon: <FaUserShield />,
+    //   name: "Package Deduction Amt (0.1%)",
+    //   value: Number(deductedAmt?.pkgAmt).toFixed(8),
+    // },
+    // {
+    //   icon: <FaUserShield />,
+    //   name: "Referral Deduction Amt (10%)",
+    //   value: Number(deductedAmt?.refAmt).toFixed(8),
+    // },
+    // {
+    //   icon: <FaUserShield />,
+    //   name: "Level Deduction Amt (10%)",
+    //   value: Number(deductedAmt?.levAmt).toFixed(8),
+    // },
+    // {
+    //   icon: <FaUserShield />,
+    //   name: "Matrix Deduction Amt (10%)",
+    //   value: Number(deductedAmt?.matAmt).toFixed(8),
+    // },
   ];
 
   if (loading) {
@@ -129,8 +136,7 @@ function Dashboard() {
             <div className="d-flex align-items-center justify-content-between rounded px-3 py-3 user-cards bg-white">
               <div
                 className="d-flex p-2 rounded dash-icon fs-2"
-                style={{ color: "#fff", background: "#ed3949" }}
-              >
+                style={{ color: "#fff", background: "#ed3949" }}>
                 {user.icon}
               </div>
               <div>

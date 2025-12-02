@@ -39,7 +39,7 @@ function Approutes() {
               <Route path="/deposit-usdt" element={<DepositUsdtToUser />} />*/}
               <Route path="/upgrade-package" element={<DepositUsdtReport />} />
               <Route path="/all-users" element={<AllUsers />} />
-              <Route path="/old-withdrawal" element={<OldWithdrawal />} />
+              <Route path="/pending-withdrawal" element={<PayoutWithdrawal />} />
               <Route path="/download-db" element={<DownloadDb />} />
               <Route path="/admin/2fa-auth" element={<Enable2FA />} />
             </>

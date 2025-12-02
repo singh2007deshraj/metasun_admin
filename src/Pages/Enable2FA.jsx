@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import { base_url } from "../config";
 import { getToken } from "../api";
 import TwoFactorAuth from "./TwoFactorAuth";
